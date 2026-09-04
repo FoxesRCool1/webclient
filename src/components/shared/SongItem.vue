@@ -1,7 +1,13 @@
 <template>
     <div
         class="songlist-item rounded-sm"
-        :class="[{ current: isCurrent() }, { contexton: context_menu_showing }]"
+        :class="[{ current: isCurrent() }, { contexton: context_menu_showing }, { dragging: isDragging }, { 'drop-above': dropIndicator === 'above' }, { 'drop-below': dropIndicator === 'below' }]"
+        :draggable="!!droppable"
+        @dragstart="onDragStart"
+        @dragover="onDragOver"
+        @dragleave="onDragLeave"
+        @dragend="onDragEnd"
+        @drop="onDrop"
         @dblclick="emitUpdate"
         @contextmenu.prevent="showMenu"
     >
@@ -124,6 +130,69 @@ onBeforeUnmount(() => {
 
 const route = useRoute()
 const isFavoritesPage = route.path.startsWith('/favorites')
+
+const isDragging = ref<boolean>(false)
+const dropIndicator = ref<'above' | 'below' | null>(null)
+
+function onDragStart(event: DragEvent) {
+    if (!props.droppable) {
+        return
+    }
+
+    event.dataTransfer?.setData('application/json', JSON.stringify({ index: props.track.index, trackhash: props.track.trackhash }))
+    event.dataTransfer.effectAllowed = 'move'
+    isDragging.value = true
+}
+
+function onDragOver(event: DragEvent) {
+    if (!props.droppable) {
+        return
+    }
+
+    event.preventDefault()
+
+    const rect = (event.currentTarget as HTMLElement).getBoundingClientRect()
+    const midpoint = rect.top + rect.height / 2
+    dropIndicator.value = event.clientY < midpoint ? 'above' : 'below'
+}
+
+function onDragLeave() {
+    dropIndicator.value = null
+}
+
+function onDragEnd() {
+    isDragging.value = false
+    dropIndicator.value = null
+}
+
+function onDrop(event: DragEvent) {
+    if (!props.droppable) {
+        return
+    }
+
+    event.preventDefault()
+
+    const raw = event.dataTransfer?.getData('application/json')
+    if (!raw) {
+        dropIndicator.value = null
+        return
+    }
+
+    const payload = JSON.parse(raw) as { index: number; trackhash: string }
+    const oldIndex = payload.index
+    const targetIndex = props.track.index as number
+
+    const insertBeforeIndex = dropIndicator.value === 'above' ? targetIndex : targetIndex + 1
+    const newIndex = oldIndex < insertBeforeIndex ? insertBeforeIndex - 1 : insertBeforeIndex
+
+    dropIndicator.value = null
+
+    if (newIndex === oldIndex) {
+        return
+    }
+
+    emit('trackDropped', props.source, props.track, newIndex, oldIndex)
+}
 </script>
 
 <style lang="scss">
@@ -187,6 +256,30 @@ const isFavoritesPage = route.path.startsWith('/favorites')
     .song-artists {
         width: fit-content;
         max-width: calc(100% - 10px);
+    }
+
+    &.dragging {
+        opacity: 0.4;
+    }
+
+    &.drop-above::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 0;
+        height: 2px;
+        background-color: $blue;
+    }
+
+    &.drop-below::after {
+        content: '';
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        height: 2px;
+        background-color: $blue;
     }
 }
 

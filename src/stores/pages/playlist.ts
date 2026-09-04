@@ -120,6 +120,10 @@ export default defineStore('playlist-tracks', {
         addTrack(track: Track) {
             this.allTracks.push(track)
         },
+        moveTrack(from_index: number, to_index: number) {
+            const [track] = this.allTracks.splice(from_index, 1)
+            this.allTracks.splice(to_index, 0, track)
+        },
         resetBannerPos() {
             try {
                 this.info.settings.banner_pos = 50

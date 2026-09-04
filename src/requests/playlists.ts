@@ -261,6 +261,24 @@ export async function removeTracks(pid: number, tracks: { trackhash: string; ind
     new Notification('Unable to remove tracks', NotifType.Error)
 }
 
+export async function reorderTracks(pid: number, from_index: number, to_index: number, trackhash: string) {
+    const { status } = await useAxios({
+        url: paths.api.playlist.base + `/${pid}/reorder-tracks`,
+        props: {
+            from_index,
+            to_index,
+            trackhash,
+        },
+    })
+
+    if (status === 200) {
+        return true
+    }
+
+    new Notification('Unable to reorder tracks', NotifType.Error)
+    return false
+}
+
 export async function removeBannerImage(playlistid: number) {
     const { data, status } = await useAxios({
         url: paths.api.playlist.base + `/${playlistid}/remove-img`,
