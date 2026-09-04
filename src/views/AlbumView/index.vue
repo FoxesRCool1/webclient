@@ -73,7 +73,7 @@ class songItem {
     props = {}
     component: typeof SongItem | typeof AlbumDiscBar
 
-    constructor(track: Track, index: number) {
+    constructor(track: Track, index: number, tracks: Track[]) {
         this.id = track.is_album_disc_number ? `disc-${track.album_page_disc_number}` : `${track.filepath}-${index}`
         this.props = track.is_album_disc_number
             ? { album_disc: track }
@@ -82,6 +82,7 @@ class songItem {
                   hide_album: true,
                   index: track.track,
                   source: dropSources.album,
+                  tracks,
               }
         this.component = track.is_album_disc_number ? AlbumDiscBar : SongItem
     }
@@ -128,8 +129,9 @@ const fetched_similar_hash: ScrollerItem = {
 }
 
 function getSongItems() {
-    return album.tracks.map((track, index) => {
-        return new songItem(track, index)
+    const tracks = album.tracks
+    return tracks.map((track, index) => {
+        return new songItem(track, index, tracks)
     })
 }
 

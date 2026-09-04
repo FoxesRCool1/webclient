@@ -85,7 +85,7 @@ class songItem {
 
     constructor(track: Track) {
         this.id = track.filepath
-        this.props = { ...createTrackProps(track), source: dropSources.folder }
+        this.props = { ...createTrackProps(track), source: dropSources.folder, tracks: folder.allTracks }
     }
 }
 

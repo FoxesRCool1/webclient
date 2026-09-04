@@ -67,7 +67,7 @@ context.$subscribe((mutation, state) => {
   top: 0;
   left: 0;
   width: 13rem;
-  z-index: 1000 !important;
+  z-index: 1003 !important;
   height: min-content;
   padding: $small;
   background: $context;

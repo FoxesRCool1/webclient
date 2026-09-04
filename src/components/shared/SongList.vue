@@ -23,6 +23,7 @@
                     :is_last="index == tracks.length - 1"
                     :droppable="false"
                     :source="source"
+                    :selectable="false"
                     @playThis="handlePlay(index)"
                     @trackDropped="dropHandler"
                 />

@@ -58,6 +58,7 @@ const scrollerItems = computed(() => {
             track,
             index: index + 1,
             source: dropSources.search,
+            tracks: search.tracks.value,
         },
     }))
 

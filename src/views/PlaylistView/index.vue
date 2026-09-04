@@ -97,6 +97,8 @@ const scrollerItems = computed(() => {
                 is_last: track.index === playlist.tracks.length - 1,
                 droppable: true,
                 source: dropSources.playlist,
+                selectable: true,
+                tracks: playlist.allTracks,
             },
             size: 64,
         }
@@ -152,7 +154,9 @@ async function playFromPlaylistPage(index: number) {
     updatePageTitle(playlist.info.name)
 })
 
-onBeforeRouteLeave(() => playlist.resetAll())
+onBeforeRouteLeave(() => {
+    playlist.resetAll()
+})
 </script>
 
 <style lang="scss">

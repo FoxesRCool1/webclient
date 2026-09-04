@@ -6,6 +6,7 @@ import useFolderPageStore from '@/stores/pages/folder'
 import usePlaylistPageStore from '@/stores/pages/playlist'
 import usePlaylistListPageStore from '@/stores/pages/playlists'
 import useArtistPageStore from '@/stores/pages/artist'
+import useSelectionStore from '@/stores/selection'
 
 import HomeView from '@/views/HomeView'
 const Lyrics = () => import('@/views/LyricsView')
@@ -275,5 +276,9 @@ const router = createRouter({
     history: createWebHashHistory(import.meta.env.BASE_URL),
     routes,
 } as RouterOptions)
+
+router.afterEach(() => {
+    useSelectionStore().clear()
+})
 
 export { router, Routes }

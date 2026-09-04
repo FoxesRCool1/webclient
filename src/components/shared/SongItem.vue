@@ -1,8 +1,9 @@
 <template>
     <div
         class="songlist-item rounded-sm"
-        :class="[{ current: isCurrent() }, { contexton: context_menu_showing }, { dragging: isDragging }, { 'drop-above': dropIndicator === 'above' }, { 'drop-below': dropIndicator === 'below' }]"
+        :class="[{ current: isCurrent() }, { contexton: context_menu_showing }, { dragging: isDragging }, { 'drop-above': dropIndicator === 'above' }, { 'drop-below': dropIndicator === 'below' }, { selected: isSelectedTrack() }]"
         :draggable="!!droppable"
+        @click="onItemClick"
         @dragstart="onDragStart"
         @dragover="onDragOver"
         @dragleave="onDragLeave"
@@ -57,6 +58,7 @@ import favoriteHandler from '@/helpers/favoriteHandler'
 import { Track } from '@/interfaces'
 import { isSmall } from '@/stores/content-width'
 import useQueueStore from '@/stores/queue'
+import useSelectionStore from '@/stores/selection'
 
 import ArtistName from './ArtistName.vue'
 import TrackAlbum from './SongItem/TrackAlbum.vue'
@@ -69,16 +71,24 @@ const settings = useSettings()
 const context_menu_showing = ref(false)
 
 const queue = useQueueStore()
+const selection = useSelectionStore()
 
-const props = defineProps<{
-    track: Track
-    index: number | string
-    hide_album?: boolean
-    is_queue_track?: boolean
-    droppable?: boolean
-    is_last?: boolean
-    source: dropSources
-}>()
+const props = withDefaults(
+    defineProps<{
+        track: Track
+        index: number | string
+        hide_album?: boolean
+        is_queue_track?: boolean
+        droppable?: boolean
+        is_last?: boolean
+        source: dropSources
+        selectable?: boolean
+        tracks?: Track[]
+    }>(),
+    {
+        selectable: true,
+    }
+)
 
 const is_fav = ref(props.track.is_favorite || false)
 
@@ -105,6 +115,31 @@ function isCurrent() {
 
 function isCurrentPlaying() {
     return isCurrent() && queue.playing
+}
+
+function isSelectedTrack() {
+    return !!props.selectable && selection.isSelected(props.track.trackhash)
+}
+
+function onItemClick(event: MouseEvent) {
+    if (!props.selectable) return
+
+    if (event.ctrlKey || event.metaKey) {
+        event.preventDefault()
+        selection.toggle(props.track, props.track.index)
+        return
+    }
+
+    if (event.shiftKey) {
+        event.preventDefault()
+
+        if (selection.lastClickedIndex === null || !props.tracks) {
+            selection.toggle(props.track, props.track.index)
+            return
+        }
+
+        selection.selectRange(props.tracks, selection.lastClickedIndex, props.track.index)
+    }
 }
 
 function addToFav(trackhash: string) {
@@ -136,6 +171,11 @@ const dropIndicator = ref<'above' | 'below' | null>(null)
 
 function onDragStart(event: DragEvent) {
     if (!props.droppable) {
+        return
+    }
+
+    if (event.ctrlKey || event.metaKey || event.shiftKey) {
+        event.preventDefault()
         return
     }
 
@@ -289,5 +329,9 @@ function onDrop(event: DragEvent) {
 
 .songlist-item.contexton {
     background-color: $gray4 !important;
+}
+
+.songlist-item.selected {
+    background-color: rgba($blue, 0.12);
 }
 </style>

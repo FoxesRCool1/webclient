@@ -41,6 +41,7 @@ export enum ContextSrc {
   FolderNav = "FolderNav",
   ArtistHeader = "ArtistHeader",
   Queue = "Queue",
+  Selection = "Selection",
 }
 
 export const FuseTrackOptions = {

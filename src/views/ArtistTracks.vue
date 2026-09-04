@@ -16,6 +16,7 @@
         :track="item.track"
         :index="index + 1"
         :source="dropSources.artist"
+        :tracks="tracks"
         @playThis="playFromPage(index)"
       />
     </RecycleScroller>

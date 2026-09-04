@@ -11,6 +11,7 @@
                 :track="song"
                 :index="total ? total - index : index + 1"
                 :source="source"
+                :tracks="tracks"
                 @playThis="playHandler(index)"
             />
         </div>

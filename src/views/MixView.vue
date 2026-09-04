@@ -90,7 +90,8 @@ const scrollerItems = computed(() => {
         size: 4 * 16,
     }
 
-    const tracks = (mix.tracks || []).map((track, index) => {
+    const mixTracks = mix.tracks || []
+    const tracks = mixTracks.map((track, index) => {
         return {
             id: Math.random(),
             component: SongItem,
@@ -100,6 +101,7 @@ const scrollerItems = computed(() => {
                 is_last: index === mix.tracks.length - 1,
                 droppable: true,
                 source: dropSources.playlist,
+                tracks: mixTracks,
             },
             size: 64,
         }

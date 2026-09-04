@@ -26,6 +26,7 @@
         </div>
         <RightSideBar v-if="settings.use_sidebar && xl" />
         <BottomBar />
+        <SelectionBar />
         <!-- <BubbleManager /> -->
     </section>
     <div v-else id="noui">
@@ -67,6 +68,7 @@ import BottomBar from '@/components/BottomBar/BottomBar.vue'
 import LeftSidebar from '@/components/LeftSidebar/index.vue'
 import NavBar from '@/components/nav/NavBar.vue'
 import RightSideBar from '@/components/RightSideBar/Main.vue'
+import SelectionBar from '@/components/shared/SelectionBar.vue'
 
 import { getAllSettings } from '@/requests/settings'
 import { getRootDirs } from '@/requests/settings/rootdirs'
